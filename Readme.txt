@@ -1,45 +1,49 @@
-Readme
+# Data Drift Analysis
 
-Abstract:
+## Abstract
 
-Data drift can be described as a change in the distribution of unseen input data when compared to the data used in training. This is a concerning problem as we gear up to deploy our pipeline in production. We want to ensure that the reports processed by our pipeline during production are similar to the surgical pathology reports we used in training. Processing a report from a different domain e.g. radiotherapy carries a high risk of poor quality abstraction, which may lead to incorrect clinical inference and in the end, endanger the patient. Data drift may also arise due to differences in the layout of the reports. The aim of the project is to find the data drfit of the unseen report when compared to the training dataset. 
+Data drift refers to a shift in the distribution of unseen input data compared to the training data. In the context of deploying a production pipeline, maintaining similarity between processed reports and the trained data is crucial. Analyzing reports from different domains (e.g., radiotherapy) poses a risk of poor quality abstractions, potentially leading to incorrect clinical inferences and risking patient safety. Data drift may also stem from differences in report layouts. This project aims to assess data drift in unseen reports compared to the training dataset.
 
-Workflow:
+## Workflow
 
-The project mainly design to take in the OCR reports and convert it into text file which is then furthere processed and operated to find the data drift. Pipeline can be describe as, first call the analysis_module which will import datadrift_module, then in datadrift_module we import preprocessing_module, going forward we use the threshold, train and model which is trained and analysis from the train_module.
+The project primarily involves processing OCR reports, converting them into text files, and conducting operations to detect data drift. The pipeline includes the following steps:
 
-Steps/ Operation:
+1. **Analysis Module**: Imports `datadrift_module`.
+2. **Datadrift Module**: Imports `preprocessing_module`. Utilizes `threshold`, `train`, and `model` from `train_module`.
+3. **Train Module**: Calculates thresholds, models, train embeddings, and vectors for TF-IDF and Word2Vec vectorization.
 
-In this section I will describe the responsibility and features of each or all four modules.
+## Steps/Operations
 
-1. tain_module:
+This section describes the functions and features of four core modules:
 
-This module is created to find and save the threshold, model, train embeddings and train vecotrs of the TF-IDF and Word2Vec vecotorization. Here the mention variables are calculated between the train and validation dataset. Validation dataset is nothing, rather just a train- test split of train dataset. That is, train dataset is splitted randomly into 80% (which is assign as train embddings) and 20%(which is assigned as validation/ test embddings). Further, six variables are calculated accrodingly:
+### 1. Train Module
 
-a. In w2v function, the word2vec vectorizer model is calculated and saved in the model variable; going forward with that model the train_embeddings are calculated and saved. Henceforth we calculate the cosine mean similartiy and find the value of 10th percentile to assign that value as threshold value and saved in the varibable threshold(w2v).
+This module calculates and saves thresholds, models, train embeddings, and vectors for TF-IDF and Word2Vec vectorization using the training and validation datasets.
 
-b. In tfidf function, tfidf vectorizer calculated and saved in the variable vectorizer(tfidf); going forward with that vectorizer we are fitting and transforming the training dataset and saving it into a variable train(tfidf). Henceforth we calculate the cosine mean similartiy and find the value of 10th percentile to assign that value as threshold value and saved in the varibable threshold(tfidf).
+#### a. Word2Vec Function
+   - Calculates the Word2Vec vectorizer model and train_embeddings.
+   - Computes cosine mean similarity and determines the 10th percentile as the threshold.
 
-Now these six variable will invoked by the datadrift module to find the datadrift with the unseend dataset.
+#### b. TF-IDF Function
+   - Computes TF-IDF vectorization.
+   - Calculates cosine mean similarity and establishes the 10th percentile as the threshold.
 
-2. preprocessing_module: 
+### 2. Preprocessing Module
 
-This module is designed so that it can be used by train_module to preprocess the training dataset and it is also used in the datadrift module to preprocess the unseen dataset. The preprocessing module comes with a striaght forward approch to preprocess the text brfore the operation is done to it. 
+This module preprocesses both the training and unseen datasets to prepare the text data for further operations. Customization is possible based on specific requirements.
 
-Please Note: Don't forget to modify the preprocessing module as per your requirements.
+### 3. Datadrift Module
 
-3. datadrift_module:
+The central module for data drift calculation. The `predict_data_drift` function takes unseen dataset and a boolean result (for TF-IDF or Word2Vec calculation).
 
-This is the main module where datadrift is been calculated. a predict_data_drift function is created in order to take two arguments, unseen dataset and a boolean result whether you want to calculate tfidf or word2vec. 
+- Preprocesses the unseen dataset and checks if TF-IDF or Word2Vec calculation is required.
+- Utilizes previously saved variables (thresholds, vectorizers, train data) from the Train Module to compute data drift.
+- Notifies if data drift exists between each unseen document and the training document.
 
-Firstly the unseen dataset is preprocessed and stored in the df_unseen dataframe. Then an if statement is called that if tfidf == 1 then;
+### 4. Analysis Module
 
-tfidf block of code is activated which will call the vectorizer, train(tfidf), and threshold(tfidf) which was saved by train_module and then data drift is calculate with the unseens dataset.
+Importing the Datadrift Module, this module calls the `predict_data_drift` function with parameters (i.e., location of the unseen dataset) to analyze and report the results.
 
-if tfidf is null or zero then word2vec block of code is activated and it calls its variable and calcultes the word2vec datadrift with the unseen dataset.
+## Note
 
-At the end, message is displayed for each of the unseen documents whether data drift exists or not with the training document. 
-
-4. analysis_module:
-
-This module is simply created for the analysation of results. It is importing the datadrift_module and predict_data_drift function is called and the parameters is given (i,e,; the location of the unseen dataset) to find the results. 
+Modules can be adapted and customized as needed to fit specific project requirements. The descriptions provide an overview of their responsibilities and intended functionalities.
